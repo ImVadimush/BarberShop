@@ -1,53 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "tw-animate-css";
 
 @layer base {
   :root {
     /* Updated color scheme for elegant salon aesthetic - white, black, gold accents */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    --background: 0 0% 99%;
+    --foreground: 0 0% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 0 0% 10%;
-    --primary-foreground: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+    --primary: 0 0% 15%;
+    --primary-foreground: 0 0% 99%;
     --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary-foreground: 0 0% 15%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 45 100% 50%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --accent: 85 8% 70%;
+    --accent-foreground: 0 0% 15%;
+    --destructive: 27.325 24.5% 57.7%;
+    --destructive-foreground: 0 0% 99%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 45 100% 50%;
+    --ring: 85 8% 70%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 20%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 45 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 45 100% 50%;
+    --background: 0 0% 14.5%;
+    --foreground: 0 0% 98.5%;
+    --card: 0 0% 14.5%;
+    --card-foreground: 0 0% 98.5%;
+    --popover: 0 0% 14.5%;
+    --popover-foreground: 0 0% 98.5%;
+    --primary: 0 0% 98.5%;
+    --primary-foreground: 0 0% 20.5%;
+    --secondary: 0 0% 26.9%;
+    --secondary-foreground: 0 0% 98.5%;
+    --muted: 0 0% 26.9%;
+    --muted-foreground: 0 0% 70.8%;
+    --accent: 85 8% 70%;
+    --accent-foreground: 0 0% 98.5%;
+    --destructive: 25.723 14.1% 39.6%;
+    --destructive-foreground: 25.331 23.7% 63.7%;
+    --border: 0 0% 26.9%;
+    --input: 0 0% 26.9%;
+    --ring: 0 0% 43.9%;
   }
 }
 
@@ -57,5 +56,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
