@@ -29,7 +29,6 @@ async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> 
         
         // W preview/development zawsze loguj token dla łatwego testowania
         if (isPreview) {
-          console.log(`🌐 [PREVIEW] Test verification for ${email}: ${tokenMatch[1]}`)
         }
       }
       
