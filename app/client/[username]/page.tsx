@@ -10,8 +10,16 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { 
   User, Mail, Phone, Calendar, LogOut, Trash2, Edit, X, Check, 
-  Scissors, Clock, AlertCircle
+  Scissors, Clock, AlertCircle, Home, Plus, Menu
 } from "lucide-react"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 interface UserData {
   _id: string
@@ -46,6 +54,7 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
     phone: ""
   })
   const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -85,10 +94,7 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
       const response = await fetch(`/api/users/${username}/bookings`)
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Bookings fetched:", data)
         setBookings(data)
-      } else {
-        console.error("[v0] Error fetching bookings:", response.status)
       }
     } catch (error) {
       console.error("Error fetching bookings:", error)
@@ -175,6 +181,7 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
 
   const handleLogout = () => {
     localStorage.removeItem('lastLoggedInUser')
+    setMobileMenuOpen(false)
     setTimeout(() => {
       router.push("/")
     }, 100)
@@ -212,25 +219,18 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
     }
   }
 
-  // ✅ NAPRAWIONO: Oblicz kiedy rezerwacja będzie usunięta (od cancelled_at, nie booking_date)
   const getDeleteInHours = (booking: Booking) => {
     if (booking.status !== 'cancelled') return null
     
-    // cancelled_at jest stringiem ISO lub Date
     const cancelledTime = new Date((booking as any).cancelled_at || new Date())
-    const deleteTime = new Date(cancelledTime.getTime() + 12 * 60 * 60 * 1000) // +12 godzin
+    const deleteTime = new Date(cancelledTime.getTime() + 12 * 60 * 60 * 1000)
     
     const now = new Date()
     const diffMs = deleteTime.getTime() - now.getTime()
     const diffHours = Math.ceil(diffMs / (1000 * 60 * 60))
     
-    if (diffHours <= 0) {
-      return "już została usunięta"
-    }
-    
-    if (diffHours < 24) {
-      return `za ${diffHours}h`
-    }
+    if (diffHours <= 0) return "już została usunięta"
+    if (diffHours < 24) return `za ${diffHours}h`
     
     const diffDays = Math.ceil(diffHours / 24)
     return `za ${diffDays}d`
@@ -245,18 +245,75 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
   }
 
   return (
-    <div className="min-h-screen bg-secondary py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="font-serif text-3xl font-bold text-foreground">
-                {userData?.name}
-              </h1>
+    <div className="min-h-screen bg-secondary">
+      {/* Mobile Menu */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-[280px]">
+          <SheetHeader>
+            <SheetTitle className="font-serif text-left">{userData?.name}</SheetTitle>
+            <SheetDescription className="text-left">@{userData?.username}</SheetDescription>
+          </SheetHeader>
+          <div className="flex flex-col gap-3 mt-8">
+            <Button
+              onClick={() => {
+                router.push("/")
+                setMobileMenuOpen(false)
+              }}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Strona główna
+            </Button>
+            <Button
+              onClick={() => {
+                router.push("/#booking")
+                setMobileMenuOpen(false)
+              }}
+              className="bg-accent text-accent-foreground hover:bg-accent/90 w-full justify-start"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nowa rezerwacja
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Wyloguj się
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Header */}
+      <div className="bg-background border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Mobile: Menu button + Title */}
+            <div className="flex items-center gap-3 md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="font-serif text-lg font-bold">{userData?.name}</h1>
+                <p className="text-xs text-muted-foreground">Profil klienta</p>
+              </div>
+            </div>
+
+            {/* Desktop: Title */}
+            <div className="hidden md:block">
+              <h1 className="font-serif text-3xl font-bold">{userData?.name}</h1>
               <p className="text-muted-foreground mt-1">Profil klienta</p>
             </div>
-            <div className="flex gap-2">
+
+            {/* Desktop: Actions */}
+            <div className="hidden md:flex gap-2">
               <Button 
                 onClick={() => router.push("/")}
                 variant="outline"
@@ -278,9 +335,20 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
                 Wyloguj
               </Button>
             </div>
+
+            {/* Mobile: Quick action button */}
+            <Button
+              onClick={() => router.push("/#booking")}
+              size="sm"
+              className="md:hidden bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-6">
         <div className="grid gap-6">
           {/* Profil */}
           <Card>
@@ -402,7 +470,7 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
               ) : (
                 <div className="space-y-3">
                   {bookings
-                    .filter(booking => booking.status !== 'completed') // Filtruj completed, ale pokazuj cancelled
+                    .filter(booking => booking.status !== 'completed')
                     .map((booking) => (
                     <div key={booking._id} className="border rounded-lg p-4 hover:bg-secondary/50 transition-colors">
                       <div className="flex items-start justify-between gap-3 mb-3">
@@ -422,7 +490,6 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
                               <Scissors className="w-3 h-3" />
                               <span>{booking.barber_name}</span>
                             </div>
-                            {/* ✅ NAPRAWIONO: Pokazuj czas usuwania od cancelled_at */}
                             {booking.status === 'cancelled' && getDeleteInHours(booking) && (
                               <div className="flex items-center gap-2 text-xs text-red-500 mt-2">
                                 <AlertCircle className="w-3 h-3" />
@@ -445,48 +512,6 @@ export default function ClientProfilePage({ params }: { params: Promise<{ userna
                       )}
                     </div>
                   ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Usuwanie konta */}
-          <Card className="border-red-200">
-            <CardHeader>
-              <CardTitle className="text-red-600 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                Niebezpieczna strefa
-              </CardTitle>
-              <CardDescription>Tej operacji nie można cofnąć</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!deleteConfirm ? (
-                <Button 
-                  variant="destructive"
-                  onClick={() => setDeleteConfirm(true)}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Usuń konto
-                </Button>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-red-600">Czy na pewno chcesz usunąć konto? Wszystkie dane zostaną trwale usunięte.</p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="destructive"
-                      onClick={handleDeleteAccount}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      Tak, usuń
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setDeleteConfirm(false)}
-                    >
-                      Anuluj
-                    </Button>
-                  </div>
                 </div>
               )}
             </CardContent>

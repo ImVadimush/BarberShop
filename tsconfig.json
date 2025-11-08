@@ -36,7 +36,7 @@
     ".next\\dev/types/**/*.ts",
     ".next\\dev/types/**/*.ts",
     "middleware.ts.ds"
-  ],
+, "scripts/reset.js"  ],
   "exclude": [
     "node_modules"
   ]

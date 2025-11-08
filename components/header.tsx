@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Scissors, User, Calendar, Menu, X, Home } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function Header() {
@@ -13,6 +14,8 @@ export function Header() {
   const [lastScrollY, setLastScrollY] = useState(0)
   const [loggedInUser, setLoggedInUser] = useState<{ username: string; name: string } | null>(null)
   const router = useRouter()
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
 
   const navigation = [
     { name: "O Nas", href: "#about" },
@@ -21,7 +24,7 @@ export function Header() {
     { name: "Opinie", href: "#reviews" },
   ]
 
-  // ✅ NOWE: Sprawdź zalogowanie
+  // ✅ Sprawdź zalogowanie
   useEffect(() => {
     const savedUser = localStorage.getItem('lastLoggedInUser')
     if (savedUser) {
@@ -52,12 +55,12 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [lastScrollY])
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-    }
+  const handleMobileLinkClick = () => {
     setIsMenuOpen(false)
+  }
+
+  const getLinkHref = (href: string) => {
+    return isHomePage ? href : `/${href}`
   }
 
   return (
@@ -97,18 +100,22 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navigation.map((item, index) => (
-              <motion.button
+              <Link
                 key={item.name}
-                onClick={() => scrollToSection(item.href)}
+                href={getLinkHref(item.href)}
                 className="relative text-white/80 hover:text-white transition-colors font-medium text-sm tracking-wide py-2 group"
-                whileHover={{ y: -2 }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
               >
-                {item.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-accent to-accent/60 transition-all duration-300 group-hover:w-full" />
-              </motion.button>
+                <motion.span
+                  whileHover={{ y: -2 }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="block"
+                >
+                  {item.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-accent to-accent/60 transition-all duration-300 group-hover:w-full" />
+                </motion.span>
+              </Link>
             ))}
           </nav>
 
@@ -165,16 +172,21 @@ export function Header() {
               <div className="border-t border-white/10 bg-black/70 backdrop-blur-md pt-6">
                 <div className="flex flex-col gap-4">
                   {navigation.map((item, index) => (
-                    <motion.button
+                    <Link
                       key={item.name}
-                      onClick={() => scrollToSection(item.href)}
+                      href={getLinkHref(item.href)}
+                      onClick={handleMobileLinkClick}
                       className="text-white/80 hover:text-white transition-colors font-medium py-3 text-left border-b border-white/10 last:border-b-0"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
                     >
-                      {item.name}
-                    </motion.button>
+                      <motion.span
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="block"
+                      >
+                        {item.name}
+                      </motion.span>
+                    </Link>
                   ))}
                   
                   <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
@@ -220,6 +232,6 @@ export function Header() {
           )}
         </AnimatePresence>
       </div>
-    </header>
+    </header> 
   )
 }
