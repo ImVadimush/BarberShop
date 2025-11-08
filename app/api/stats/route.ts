@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getBookingStats } from "@/lib/db"
 import { getSession } from "@/lib/auth"
 
+export const dynamic = 'force-dynamic' // ✅ DODAJ TĘ LINIĘ
+
 export async function GET() {
   try {
     const session = await getSession()

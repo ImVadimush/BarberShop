@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { getDb } from "@/lib/mongodb"
 
+export const dynamic = 'force-dynamic' // ✅ DODAJ TĘ LINIĘ
+
 export async function GET(request: Request) {
   try {
     const db = await getDb()
